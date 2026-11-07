@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم | Ebaid Store</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind custom configuration for custom colors -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ps: {
+              blue: '#0072CE',
+              darkBlue: '#00458C',
+              bgDark: '#050505',
+              cardBg: '#111111',
+              border: 'rgba(255, 255, 255, 0.08)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Custom Style -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body class="bg-ps-bg-dark text-slate-100 min-h-screen pb-12">
+
+  <!-- Header Section -->
+  <nav class="ps-nav sticky top-0 z-50 py-4 px-6 md:px-12 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <span class="text-3xl text-ps-blue flex items-center justify-center font-bold glow-text">
+        <i class="fa-brands fa-playstation ml-2"></i>
+        <span class="text-white text-xl md:text-2xl font-extrabold tracking-wider">Ebaid Store - لوحة التحكم</span>
+      </span>
+    </div>
+    
+    <div class="flex items-center gap-4">
+      <a href="./index.html" class="px-4 py-2 hover:text-ps-blue text-slate-400 font-medium transition duration-300 flex items-center gap-2">
+        <i class="fa-solid fa-gamepad"></i>
+        <span>المكتبة</span>
+      </a>
+      <a href="./admin.html" class="px-4 py-2 text-ps-blue font-bold border-b-2 border-ps-blue transition duration-300 flex items-center gap-2">
+        <i class="fa-solid fa-user-gear"></i>
+        <span>لوحة الإدارة</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Notification Banner -->
+  <div id="toast" class="fixed bottom-6 left-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div id="toast-content" class="bg-slate-800 border-r-4 border-ps-blue text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+      <span id="toast-icon" class="text-ps-blue text-xl"><i class="fa-solid fa-circle-check"></i></span>
+      <span id="toast-message" class="font-medium text-sm">تم تنفيذ العملية بنجاح!</span>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-6 md:px-12 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Left Column: Add / Edit Game Form (Take up 5/12 grid spaces) -->
+      <section class="lg:col-span-5 bg-ps-cardBg border border-ps-border rounded-2xl p-6 md:p-8 shadow-xl">
+        <div class="flex justify-between items-center mb-6">
+          <h2 id="form-title" class="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-circle-plus text-ps-blue"></i>
+            <span>إضافة لعبة جديدة</span>
+          </h2>
+          <!-- Reset form button if in editing mode -->
+          <button id="cancel-edit-btn" class="hidden text-xs bg-slate-800 text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 transition">
+            <i class="fa-solid fa-xmark ml-1"></i> إلغاء التعديل
+          </button>
+        </div>
+
+        <form id="game-form" class="space-y-5">
+          <!-- Game ID (hidden for edit) -->
+          <input type="hidden" id="game-id" />
+
+          <!-- Form Mode Tab Switcher -->
+          <div class="mb-4">
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-layer-group text-ps-blue"></i>
+              <span>اختر فئة الإضافة والادخال:</span>
+            </label>
+            <div class="bg-slate-950/60 p-1 rounded-xl border border-ps-border/50 grid grid-cols-5 gap-1">
+              <button 
+                type="button" 
+                id="form-tab-modded" 
+                class="py-2 px-0.5 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer bg-ps-blue text-white shadow-md border border-ps-blue/20"
+              >
+                <i class="fa-solid fa-gamepad text-xs"></i>
+                <span class="truncate w-full text-center">ألعاب معدلة</span>
+              </button>
+              <button 
+                type="button" 
+                id="form-tab-account" 
+                class="py-2 px-0.5 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer text-slate-400 hover:text-white"
+              >
+                <i class="fa-solid fa-user-gear text-xs text-sky-400"></i>
+                <span class="truncate w-full text-center">ألعاب حسابات</span>
+              </button>
+              <button 
+                type="button" 
+                id="form-tab-maintenance" 
+                class="py-2 px-0.5 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer text-slate-400 hover:text-white"
+              >
+                <i class="fa-solid fa-screwdriver-wrench text-xs text-amber-500"></i>
+                <span class="truncate w-full text-center">صيانة وإصلاح</span>
+              </button>
+              <button 
+                type="button" 
+                id="form-tab-device" 
+                class="py-2 px-0.5 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer text-slate-400 hover:text-white"
+              >
+                <i class="fa-solid fa-laptop text-xs text-cyan-500"></i>
+                <span class="truncate w-full text-center">أجهزة ألعاب</span>
+              </button>
+              <button 
+                type="button" 
+                id="form-tab-controller" 
+                class="py-2 px-0.5 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer text-slate-400 hover:text-white"
+              >
+                <i class="fa-solid fa-gamepad text-xs text-rose-500"></i>
+                <span class="truncate w-full text-center">ذراعات وإكسسوار</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Name & AI Auto-Fill Integrated -->
+          <div>
+            <label for="name" class="block text-sm font-medium text-slate-300 mb-2 flex items-center justify-between">
+              <span class="flex items-center gap-1">
+                <span id="name-label-text">اسم اللعبة</span>
+                <span class="text-rose-500">*</span>
+              </span>
+              <span class="text-[10px] text-ps-blue font-bold flex items-center gap-1">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>اكتب الاسم واضغط تعبئة ذكية لملء التفاصيل تلقائياً!</span>
+              </span>
+            </label>
+            <div class="relative flex gap-2">
+              <div class="relative flex-1">
+                <span class="absolute inset-y-0 right-3 flex items-center text-slate-500"><i class="fa-solid fa-signature"></i></span>
+                <input type="text" id="name" required placeholder="مثال: Resident Evil 4 Remake" class="w-full pr-10 pl-3 py-3 rounded-lg ps-input" />
+              </div>
+              <button type="button" id="ai-search-btn" class="bg-ps-blue hover:bg-ps-blueLight text-white font-bold text-xs px-4 rounded-lg flex items-center gap-1.5 transition cursor-pointer shrink-0 shadow-md border border-ps-blue/30" title="تعبئة تلقائية لكامل بيانات اللعبة بالذكاء الاصطناعي">
+                <i id="ai-search-icon" class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                <span id="ai-search-text">تعبئة ذكية ✨</span>
+              </button>
+            </div>
+            <div id="ai-search-status" class="text-[11px] text-amber-400 mt-2 hidden flex items-center gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-ps-blue/20">
+              <i class="fa-solid fa-circle-notch animate-spin text-ps-blue text-sm"></i>
+              <span id="ai-status-text">جاري جلب بيانات اللعبة (الغلاف، التقييم، التريلر، الوصف) بالذكاء الاصطناعي...</span>
+            </div>
+          </div>
+
+          <!-- Title ID & Size -->
+          <div id="row-titleId-size" class="grid grid-cols-2 gap-4">
+            <div id="container-titleId">
+              <label for="titleId" class="block text-sm font-medium text-slate-300 mb-2">رمز اللعبة (Title ID)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 right-3 flex items-center text-slate-500"><i class="fa-solid fa-barcode"></i></span>
+                <input type="text" id="titleId" placeholder="مثال: CUSA07408" class="w-full pr-10 pl-3 py-3 rounded-lg ps-input uppercase" />
+              </div>
+            </div>
+            <div id="container-size">
+              <label id="size-label-text" for="size" class="block text-sm font-medium text-slate-300 mb-2">الحجم</label>
+              <div class="relative">
+                <span id="size-icon" class="absolute inset-y-0 right-3 flex items-center text-slate-500"><i class="fa-solid fa-weight-hanging"></i></span>
+                <input type="text" id="size" placeholder="مثال: 45 GB" class="w-full pr-10 pl-3 py-3 rounded-lg ps-input" />
+              </div>
+            </div>
+          </div>
+
+          <!-- HDD & Genre Selection -->
+          <div id="row-hdd-genre" class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-2">الهارد ديسك (HDD)</label>
+              <div class="relative">
+                <button type="button" id="hdd-dropdown-toggle" class="w-full px-3 py-3 rounded-lg ps-input bg-ps-cardBg text-right flex justify-between items-center cursor-pointer border border-ps-border/50 hover:border-ps-blue/50 transition select-none">
+                  <span id="selected-hdds-text" class="text-slate-300 font-semibold text-sm truncate">اختر الهارد...</span>
+                  <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
+                </button>
+                <div id="hdd-dropdown-menu" class="absolute left-0 right-0 mt-2 p-3 bg-ps-cardBg rounded-xl border border-ps-border shadow-2xl max-h-[220px] overflow-y-auto hidden z-50">
+                  <div id="hdd-checkboxes-container" class="space-y-2">
+                    <!-- Dynamically loaded checkboxes -->
+                  </div>
+                </div>
+              </div>
+              <input type="text" id="hdd-custom" placeholder="اسم هارد مخصص..." class="w-full px-3 py-3 mt-2 rounded-lg ps-input hidden" />
+            </div>
+            <div>
+              <label for="genre" class="block text-sm font-medium text-slate-300 mb-2">نوع اللعبة (القسم)</label>
+              <select id="genre" class="w-full px-3 py-3 rounded-lg ps-input bg-ps-cardBg cursor-pointer font-semibold text-slate-200">
+                <option value="أكشن">أكشن</option>
+                <option value="مغامرات">مغامرات</option>
+                <option value="رياضة">رياضة</option>
+                <option value="رعب">رعب</option>
+                <option value="سباق">سباق</option>
+                <option value="شوتر">شوتر</option>
+                <option value="عائلي">عائلي</option>
+                <option value="قتال">قتال</option>
+                <option value="عالم مفتوح">عالم مفتوح</option>
+                <option value="أطفال">أطفال</option>
+                <option value="ألغاز">ألغاز</option>
+                <option value="محاكاة">محاكاة</option>
+                <option value="RPG">أر بي جي (RPG)</option>
+                <option value="تحديث وإضافات">تحديث وإضافات</option>
+                <option value="custom">أخرى (كتابة يدوي مخصص)...</option>
+              </select>
+              <input type="text" id="genre-custom" placeholder="نوع اللعبة الجديد..." class="w-full px-3 py-3 mt-2 rounded-lg ps-input hidden font-medium" />
+            </div>
+          </div>
+
+          <!-- Game Licensing Type (Modded vs Account) & Console/Platform Selection -->
+          <div id="row-type-console" class="grid grid-cols-2 gap-4">
+            <div id="container-gametype" class="hidden">
+              <label for="gameType" class="block text-sm font-medium text-slate-300 mb-2">نوع ترخيص اللعبة (الفئة)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 right-3 flex items-center text-ps-blue"><i class="fa-solid fa-tags"></i></span>
+                <select id="gameType" class="w-full pr-10 pl-3 py-3 rounded-lg ps-input bg-ps-cardBg cursor-pointer font-semibold text-slate-200">
+                  <option value="modded">ألعاب معدلة (Hen / PKG)</option>
+                  <option value="account">ألعاب أكونتات (Accounts / حسابات مشتركة)</option>
+                  <option value="maintenance">شغل صيانة وإصلاحات (Maintenance)</option>
+                  <option value="device">أجهزة ألعاب للبيع والشراء (Consoles)</option>
+                  <option value="controller">ذراعات وإكسسوارات (Controllers)</option>
+                </select>
+              </div>
+            </div>
+            <div id="container-console">
+              <label for="console" class="block text-sm font-medium text-slate-300 mb-2">جهاز اللعبة (المنصة)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 right-3 flex items-center text-ps-blue"><i class="fa-solid fa-gamepad"></i></span>
+                <select id="console" class="w-full pr-10 pl-3 py-3 rounded-lg ps-input bg-ps-cardBg cursor-pointer font-semibold text-slate-200">
+                  <option value="PS4">PlayStation 4</option>
+                  <option value="PS5">PlayStation 5</option>
+                  <option value="PS3">PlayStation 3</option>
+                  <option value="Xbox">Xbox</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Path -->
+          <div id="container-path">
+            <label for="path" class="block text-sm font-medium text-slate-300 mb-2">مسار الحفظ الكامل (تلقائي)</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 right-3 flex items-center text-slate-500"><i class="fa-solid fa-hard-drive"></i></span>
+              <input type="text" id="path" placeholder="مثال: HDD 1 > أكشن" class="w-full pr-10 pl-3 py-3 rounded-lg ps-input" />
+            </div>
+          </div>
+
+          <!-- Trailer URL -->
+          <div id="container-trailer">
+            <label for="trailer-url" class="block text-sm font-medium text-slate-300 mb-2">رابط تريلر اليوتيوب (YouTube Trailer)</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 right-3 flex items-center text-red-500"><i class="fa-brands fa-youtube"></i></span>
+              <input type="url" id="trailer-url" placeholder="مثال: https://www.youtube.com/watch?v=..." class="w-full pr-10 pl-3 py-3 rounded-lg ps-input" />
+            </div>
+          </div>
+
+          <!-- Rating & Description -->
+          <div id="row-rating-description" class="grid grid-cols-2 gap-4">
+            <div id="container-rating">
+              <label for="rating" class="block text-sm font-medium text-slate-300 mb-2">تقييم اللعبة (Rating)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 right-3 flex items-center text-amber-500"><i class="fa-solid fa-star"></i></span>
+                <input type="text" id="rating" placeholder="مثال: 9.5/10" class="w-full pr-10 pl-3 py-3 rounded-lg ps-input" />
+              </div>
+            </div>
+            <div id="container-description">
+              <label id="description-label-text" for="description" class="block text-sm font-medium text-slate-300 mb-2">وصف قصير للعبة</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 right-3 flex items-center text-slate-400"><i class="fa-solid fa-file-invoice"></i></span>
+                <input type="text" id="description" placeholder="قصة أو شرح مختصر..." class="w-full pr-10 pl-3 py-3 rounded-lg ps-input" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Cover Image Upload -->
+          <div>
+            <label id="cover-label-text" class="block text-sm font-medium text-slate-300 mb-2">صورة الغلاف (Cover)</label>
+            <div id="dropzone" class="upload-zone rounded-xl p-5 text-center cursor-pointer flex flex-col items-center justify-center border-dashed">
+              <input type="file" id="cover-file" accept="image/*" class="hidden" />
+              <input type="hidden" id="cover-url" />
+              
+              <!-- Icon/Prompt -->
+              <div id="upload-prompt" class="space-y-2">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 mb-1"></i>
+                <p id="upload-prompt-text" class="text-sm font-semibold text-slate-300">اضغط أو اسحب صورة الغلاف هنا</p>
+                <p class="text-xs text-slate-500">JPG, PNG, WebP (بنسبة 2:3 يفضل)</p>
+              </div>
+
+              <!-- Uploading state indicator -->
+              <div id="upload-loading" class="hidden space-y-2">
+                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-ps-blue mx-auto"></div>
+                <p class="text-xs text-slate-400">جاري رفع الصورة...</p>
+              </div>
+
+              <!-- Image preview thumbnail -->
+              <div id="upload-preview-container" class="hidden relative w-24 h-36 border border-ps-border rounded-lg overflow-hidden mx-auto mt-2 shadow-md">
+                <img id="upload-preview" class="w-full h-full object-cover" src="" alt="Cover Preview" />
+                <button type="button" id="remove-cover" class="absolute top-1 left-1 bg-rose-600/90 hover:bg-rose-700 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs transition duration-200">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="submit-btn" class="w-full py-4.5 rounded-xl text-white font-bold glow-btn cursor-pointer flex items-center justify-center gap-2 text-base">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>حفظ اللعبة</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Right Column: Game Table / List (Take up 7/12 grid spaces) -->
+      <section class="lg:col-span-7 space-y-6">
+
+        <!-- Hard Drive Manager Card -->
+        <div class="bg-ps-cardBg border border-ps-border rounded-2xl p-6 shadow-xl space-y-4">
+          <div class="pb-3 border-b border-ps-border">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-hard-drive text-ps-blue"></i>
+              <span>إدارة أقراص الهارد ديسك (HDD Manager)</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-1">
+              أضف أسماء الهاردات الخاصة بك هنا لتتمكن من اختيارها بسرعة في قائمة الإضافة والتعديل بدون الحاجة لكتابتها يدوياً كل مرة.
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Add HDD Input and Button -->
+            <div class="flex gap-2">
+              <div class="relative flex-1">
+                <span class="absolute inset-y-0 right-3 flex items-center text-slate-500"><i class="fa-solid fa-folder-plus"></i></span>
+                <input type="text" id="new-hdd-name" placeholder="مثال: HDD 3 أو هارد خارجي 1" class="w-full pr-10 pl-3 py-2.5 text-xs rounded-lg ps-input" />
+              </div>
+              <button type="button" id="add-hdd-btn" class="bg-gradient-to-r from-ps-blue to-ps-darkBlue hover:brightness-115 text-white font-bold text-xs px-5 py-2.5 rounded-lg flex items-center gap-2 transition shrink-0 cursor-pointer shadow-md">
+                <i class="fa-solid fa-plus"></i>
+                <span>إضافة هارد</span>
+              </button>
+            </div>
+            
+            <!-- List of current HDDs -->
+            <div>
+              <p class="text-[10px] text-slate-400 font-semibold mb-2">مساحات وحالة الهاردات الحالية (انقر على هارد للتصفية السريعة للألعاب، واضبط السعة لحساب المساحة):</p>
+              <div id="hdds-badges-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Dynamically populated with badges -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reminders / Watchlist Card -->
+        <div class="bg-ps-cardBg border border-ps-border rounded-2xl p-6 shadow-xl space-y-4">
+          <div class="pb-3 border-b border-ps-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-bell text-amber-500"></i>
+                <span>قائمة الانتظار وتذكير التنزيل (Download Watchlist)</span>
+              </h3>
+              <p class="text-xs text-slate-400 mt-1">
+                سجل الألعاب أو التحديثات التي تخطط لتحميلها، وعند تحميلها يمكنك إضافتها للمكتبة فوراً بضغطة زر واحدة!
+              </p>
+            </div>
+            <!-- Toggle/Add Reminder button -->
+            <button type="button" id="show-add-reminder-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-slate-700 transition cursor-pointer flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
+              <i class="fa-solid fa-plus text-amber-500"></i>
+              <span>إضافة تذكير</span>
+            </button>
+          </div>
+
+          <!-- Add Reminder Form (Collapsible/Hidden by default) -->
+          <div id="add-reminder-section" class="hidden bg-slate-950/60 p-4 border border-ps-border/50 rounded-xl space-y-3.5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label for="rem-name" class="block text-[11px] font-bold text-slate-400 mb-1.5">اسم اللعبة / التحديث <span class="text-rose-500">*</span></label>
+                <input type="text" id="rem-name" placeholder="مثال: Resident Evil 4 Update 1.10" class="w-full px-3 py-2 text-xs rounded-lg ps-input" />
+              </div>
+              <div>
+                <label for="rem-type" class="block text-[11px] font-bold text-slate-400 mb-1.5">النوع</label>
+                <select id="rem-type" class="w-full px-3 py-2 text-xs rounded-lg ps-input bg-ps-cardBg cursor-pointer">
+                  <option value="game">لعبة كاملة (Full Game)</option>
+                  <option value="update">تحديث أو إضافة (Update / DLC)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label for="rem-titleId" class="block text-[11px] font-bold text-slate-400 mb-1.5">كود اللعبة (Title ID)</label>
+                <input type="text" id="rem-titleId" placeholder="مثال: CUSA07408" class="w-full px-3 py-2 text-xs rounded-lg ps-input uppercase" />
+              </div>
+              <div>
+                <label for="rem-hdd" class="block text-[11px] font-bold text-slate-400 mb-1.5">الهارد ديسك المستهدف</label>
+                <select id="rem-hdd" class="w-full px-3 py-2 text-xs rounded-lg ps-input bg-ps-cardBg cursor-pointer">
+                  <!-- Loaded dynamically from current HDDs -->
+                </select>
+              </div>
+              <div>
+                <label for="rem-path" class="block text-[11px] font-bold text-slate-400 mb-1.5">مسار الحفظ المتوقع</label>
+                <input type="text" id="rem-path" placeholder="أكشن > رعب" class="w-full px-3 py-2 text-xs rounded-lg ps-input" />
+              </div>
+            </div>
+
+            <div>
+              <label for="rem-notes" class="block text-[11px] font-bold text-slate-400 mb-1.5">ملاحظات أو تفاصيل إضافية</label>
+              <input type="text" id="rem-notes" placeholder="رابط التحميل أو ملاحظات بخصوص التحديث..." class="w-full px-3 py-2 text-xs rounded-lg ps-input" />
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1">
+              <button type="button" id="cancel-reminder-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-300 font-bold text-[11px] px-3.5 py-2 rounded-lg transition cursor-pointer">
+                إلغاء
+              </button>
+              <button type="button" id="save-reminder-btn" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-white font-bold text-[11px] px-4 py-2 rounded-lg transition cursor-pointer shadow-md flex items-center gap-1.5">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>حفظ التذكير</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- List of current Reminders -->
+          <div id="reminders-list-container" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+            <!-- Dynamically populated with reminders -->
+            <div class="text-center py-6 text-slate-500 text-xs">
+              <i class="fa-solid fa-bell-slash text-2xl mb-1 text-slate-600 block"></i>
+              لا توجد تذكيرات حالياً. ابدأ بإضافة تذكير للعبة أو تحديث!
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-ps-cardBg border border-ps-border rounded-2xl p-6 shadow-xl">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-ps-blue"></i>
+              <span>الألعاب المسجلة في المكتبة</span>
+            </h2>
+            <p class="text-slate-400 text-xs mt-1">تعديل معلومات الألعاب أو حذفها نهائياً من القائمة.</p>
+          </div>
+          <!-- Layout toggle & Search Container -->
+          <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <!-- Layout toggle buttons -->
+            <div class="flex bg-slate-900/80 p-1 rounded-xl border border-ps-border">
+              <button type="button" id="btn-view-grid" class="px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition text-white bg-ps-blue shadow cursor-pointer" title="عرض الشبكة">
+                <i class="fa-solid fa-table-cells"></i>
+                <span>شبكة</span>
+              </button>
+              <button type="button" id="btn-view-table" class="px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition text-slate-400 hover:text-white cursor-pointer" title="عرض الجدول">
+                <i class="fa-solid fa-list"></i>
+                <span>جدول</span>
+              </button>
+            </div>
+            
+            <!-- Simple search inside table -->
+            <div class="relative w-full sm:w-64">
+              <span class="absolute inset-y-0 right-3 flex items-center text-slate-500"><i class="fa-solid fa-magnifying-glass"></i></span>
+              <input type="text" id="admin-search" placeholder="بحث سريع..." class="w-full pr-9 pl-3 py-2 rounded-lg ps-input text-sm" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Games View Card container -->
+        <div class="bg-ps-cardBg border border-ps-border rounded-2xl overflow-hidden shadow-xl p-5">
+          
+          <!-- Admin Category Tabs Switcher -->
+          <div class="mb-5 bg-slate-950/60 p-1.5 rounded-xl border border-ps-border/50 flex flex-wrap sm:flex-nowrap items-center justify-center gap-1">
+            <button 
+              type="button"
+              id="admin-tab-all" 
+              class="flex-1 min-w-[80px] py-2 px-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer bg-ps-blue text-white shadow-md"
+            >
+              <i class="fa-solid fa-border-all text-[10px]"></i>
+              <span>الكل</span>
+            </button>
+            <button 
+              type="button"
+              id="admin-tab-games" 
+              class="flex-1 min-w-[100px] py-2 px-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer text-slate-400 hover:text-white"
+            >
+              <i class="fa-solid fa-gamepad text-[10px]"></i>
+              <span>الألعاب</span>
+            </button>
+            <button 
+              type="button"
+              id="admin-tab-maintenance" 
+              class="flex-1 min-w-[100px] py-2 px-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer text-slate-400 hover:text-white"
+            >
+              <i class="fa-solid fa-screwdriver-wrench text-amber-500 text-[10px]"></i>
+              <span>صيانة وإصلاح</span>
+            </button>
+            <button 
+              type="button"
+              id="admin-tab-device" 
+              class="flex-1 min-w-[100px] py-2 px-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer text-slate-400 hover:text-white"
+            >
+              <i class="fa-solid fa-laptop text-cyan-500 text-[10px]"></i>
+              <span>أجهزة ألعاب</span>
+            </button>
+            <button 
+              type="button"
+              id="admin-tab-controller" 
+              class="flex-1 min-w-[100px] py-2 px-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer text-slate-400 hover:text-white"
+            >
+              <i class="fa-solid fa-gamepad text-rose-500 text-[10px]"></i>
+              <span>ذراعات وإكسسوار</span>
+            </button>
+          </div>
+          
+          <!-- Table View (hidden by default since we default to grid layout for better browsing) -->
+          <div id="admin-table-view" class="overflow-x-auto hidden">
+            <table class="w-full border-collapse text-right">
+              <thead>
+                <tr class="bg-slate-800/40 border-b border-ps-border text-slate-400 text-xs font-bold uppercase tracking-wider">
+                  <th class="py-4 px-5">اللعبة</th>
+                  <th class="py-4 px-5">الموقع</th>
+                  <th class="py-4 px-5">الحجم</th>
+                  <th class="py-4 px-5 text-center">الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="admin-games-list" class="divide-y divide-ps-border text-sm">
+                <!-- Loaded dynamically -->
+                <tr class="text-center py-10 text-slate-500" id="table-loading">
+                  <td colspan="4" class="py-10">
+                    <div class="flex justify-center items-center gap-2 text-slate-400">
+                      <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-ps-blue"></div>
+                      <span>جاري تحميل الألعاب...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Grid View (default for smooth, non-scroll heavy browsing) -->
+          <div id="admin-grid-view" class="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <!-- Loaded dynamically as game cards -->
+            <div class="col-span-full text-center py-10 text-slate-500" id="grid-loading">
+              <div class="flex justify-center items-center gap-2 text-slate-400">
+                <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-ps-blue"></div>
+                <span>جاري تحميل الألعاب...</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="no-admin-games" class="hidden text-center py-12 text-slate-500">
+            <i class="fa-solid fa-ban text-3xl mb-2 text-slate-600 block"></i>
+            لا توجد ألعاب مضافة حتى الآن. ابدأ بإضافة لعبة جديدة!
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Custom Modal for Rename HDD -->
+  <div id="rename-hdd-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity hidden">
+    <div class="bg-slate-900 border border-ps-border rounded-2xl w-full max-w-md p-6 shadow-2xl relative mx-4 transform scale-95 transition-all">
+      <div class="pb-4 border-b border-ps-border mb-4 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-pen text-amber-500"></i>
+          <span>تعديل اسم الهارد ديسك</span>
+        </h3>
+        <button id="close-rename-modal" class="text-slate-400 hover:text-white transition cursor-pointer text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <input type="hidden" id="rename-hdd-old-name" />
+        <div class="space-y-1.5">
+          <label for="rename-hdd-new-name" class="block text-xs font-bold text-slate-400">الاسم الجديد للهارد ديسك</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 right-3 flex items-center text-slate-500"><i class="fa-solid fa-hard-drive"></i></span>
+            <input type="text" id="rename-hdd-new-name" placeholder="مثال: HDD 3" class="w-full pr-10 pl-3 py-2.5 text-sm rounded-lg ps-input" />
+          </div>
+        </div>
+        
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancel-rename-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-4 py-2.5 rounded-lg transition cursor-pointer">
+            إلغاء
+          </button>
+          <button type="button" id="save-rename-btn" class="bg-gradient-to-r from-ps-blue to-ps-darkBlue hover:brightness-115 text-white font-bold text-xs px-5 py-2.5 rounded-lg transition cursor-pointer shadow-md">
+            حفظ التغييرات
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Modal for Delete HDD -->
+  <div id="delete-hdd-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity hidden">
+    <div class="bg-slate-900 border border-ps-border rounded-2xl w-full max-w-md p-6 shadow-2xl relative mx-4 transform scale-95 transition-all">
+      <div class="pb-4 border-b border-ps-border mb-4 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+          <span>حذف الهارد ديسك</span>
+        </h3>
+        <button id="close-delete-hdd-modal" class="text-slate-400 hover:text-white transition cursor-pointer text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <input type="hidden" id="delete-hdd-name" />
+        <p class="text-slate-300 text-sm leading-relaxed" id="delete-hdd-text">
+          هل أنت متأكد من حذف الهارد ديسك؟ لن يتم حذف الألعاب المرتبطة به، لكن لن يظهر في القائمة المنسدلة.
+        </p>
+        
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancel-delete-hdd-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-4 py-2.5 rounded-lg transition cursor-pointer">
+            إلغاء
+          </button>
+          <button type="button" id="confirm-delete-hdd-btn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-5 py-2.5 rounded-lg transition cursor-pointer shadow-md">
+            حذف الهارد
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Modal for Delete Game -->
+  <div id="delete-game-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity hidden">
+    <div class="bg-slate-900 border border-ps-border rounded-2xl w-full max-w-md p-6 shadow-2xl relative mx-4 transform scale-95 transition-all">
+      <div class="pb-4 border-b border-ps-border mb-4 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+          <span>حذف اللعبة نهائياً</span>
+        </h3>
+        <button id="close-delete-game-modal" class="text-slate-400 hover:text-white transition cursor-pointer text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <input type="hidden" id="delete-game-id" />
+        <p class="text-slate-300 text-sm leading-relaxed" id="delete-game-text">
+          هل أنت متأكد من حذف هذه اللعبة نهائياً من المكتبة؟
+        </p>
+        
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancel-delete-game-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-4 py-2.5 rounded-lg transition cursor-pointer">
+            إلغاء
+          </button>
+          <button type="button" id="confirm-delete-game-btn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-5 py-2.5 rounded-lg transition cursor-pointer shadow-md">
+            تأكيد الحذف
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin.js -->
+  <script src="./admin.js"></script>
+</body>
+</html>

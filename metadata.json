@@ -1,0 +1,6 @@
+{
+  "name": "Ebaid Store",
+  "description": "مكتبة ألعاب PlayStation 4 لإدارة وتصفح ألعاب محل الألعاب بسهولة وتنظيم",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

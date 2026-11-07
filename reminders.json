@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "name": "The Last of Us Part II",
+    "type": "game",
+    "titleId": "",
+    "notes": "",
+    "hdd": "",
+    "path": "",
+    "status": "pending",
+    "createdAt": "2026-07-15T22:41:07.299Z"
+  },
+  {
+    "id": 3,
+    "name": "Tomb Raider",
+    "type": "game",
+    "titleId": "",
+    "notes": "",
+    "hdd": "",
+    "path": "",
+    "status": "pending",
+    "createdAt": "2026-07-15T22:42:26.250Z"
+  },
+  {
+    "id": 4,
+    "name": "Batman: Arkham Knight",
+    "type": "game",
+    "titleId": "",
+    "notes": "",
+    "hdd": "",
+    "path": "",
+    "status": "pending",
+    "createdAt": "2026-07-15T23:26:44.385Z"
+  },
+  {
+    "id": 6,
+    "name": "Detroit: Become Human",
+    "type": "game",
+    "titleId": "",
+    "notes": "",
+    "hdd": "",
+    "path": "",
+    "status": "pending",
+    "createdAt": "2026-07-15T23:28:32.859Z"
+  },
+  {
+    "id": 7,
+    "name": "mortal kombat x",
+    "type": "game",
+    "titleId": "",
+    "notes": "",
+    "hdd": "",
+    "path": "",
+    "status": "pending",
+    "createdAt": "2026-07-17T15:27:29.516Z"
+  },
+  {
+    "id": 8,
+    "name": "mortal kombat xL",
+    "type": "game",
+    "titleId": "",
+    "notes": "",
+    "hdd": "",
+    "path": "",
+    "status": "pending",
+    "createdAt": "2026-07-17T15:27:46.617Z"
+  }
+]
