@@ -251,23 +251,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fetch games on startup
   async function fetchGames() {
     try {
-      let response;
-      const isGitHubPages = window.location.hostname.includes("github.io") || window.location.protocol === "file:";
-      
-      if (!isGitHubPages) {
-        try {
-          response = await fetch("/api/games");
-        } catch (e) {
-          // Fallback to static games.json
-        }
+      // 1. Try embedded games data first (pure frontend static mode)
+      if (window.GAMES_DATA && Array.isArray(window.GAMES_DATA) && window.GAMES_DATA.length > 0) {
+        allGames = JSON.parse(JSON.stringify(window.GAMES_DATA));
+      } else {
+        // 2. Fallback to fetch games.json
+        const response = await fetch("./games.json");
+        if (!response.ok) throw new Error("Failed to load games data");
+        allGames = await response.json();
       }
-      
-      if (!response || !response.ok) {
-        response = await fetch("./games.json");
-      }
-
-      if (!response.ok) throw new Error("Failed to load games");
-      allGames = await response.json();
       
       // Ensure relative paths for covers so they work on GitHub Pages subpaths
       allGames.forEach(g => {
